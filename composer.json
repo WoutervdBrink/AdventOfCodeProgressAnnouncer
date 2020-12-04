@@ -1,0 +1,22 @@
+{
+    "name": "knevelina/aoc-progress-announcer",
+    "description": "Announces AoC progress in private leaderboards.",
+    "type": "project",
+    "require": {
+        "guzzlehttp/guzzle": "^7.2",
+        "vlucas/phpdotenv": "^5.2",
+        "catfan/medoo": "^1.7"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wouter van den Brink",
+            "email": "git@woutervdb.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Knevelina\\AocProgressAnnouncer\\": "src/"
+        }
+    }
+}
