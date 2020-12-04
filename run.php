@@ -34,14 +34,14 @@ foreach ($leaderboard->getMembers() as $member) {
 
     /** @var AocDay $day */
     foreach ($member->getDays() as $day) {
-        if (!$db->hasStar($member->getId(), $day->getDay(), 1)) {
+        if ($day->hasPart1() && !$db->hasStar($member->getId(), $day->getDay(), 1)) {
             $newStars[] = ['member' => $member, 'day' => $day->getDay(), 'part' => 1];
             $db->storeStar($member->getId(), $day->getDay(), 1, $day->getPart1());
         }
 
-        if (!$db->hasStar($member->getId(), $day->getDay(), 2)) {
+        if ($day->hasPart2() && !$db->hasStar($member->getId(), $day->getDay(), 2)) {
             $newStars[] = ['member' => $member, 'day' => $day->getDay(), 'part' => 2];
-            $db->storeStar($member->getId(), $day->getDay(), 2, $day->getPart1());
+            $db->storeStar($member->getId(), $day->getDay(), 2, $day->getPart2());
         }
     }
 
