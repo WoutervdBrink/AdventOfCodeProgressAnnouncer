@@ -5,7 +5,8 @@
     "require": {
         "guzzlehttp/guzzle": "^7.2",
         "vlucas/phpdotenv": "^5.2",
-        "catfan/medoo": "^1.7"
+        "catfan/medoo": "^1.7",
+        "ext-json": "*"
     },
     "license": "MIT",
     "authors": [

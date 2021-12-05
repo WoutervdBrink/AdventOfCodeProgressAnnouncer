@@ -24,7 +24,7 @@ class AocLeaderboard
     }
 
 
-    public static function query()
+    public static function query(int $year): AocLeaderboard
     {
         $jar = \GuzzleHttp\Cookie\CookieJar::fromArray([
             'session' => $_ENV['SESSION_COOKIE']
@@ -33,7 +33,7 @@ class AocLeaderboard
         $client = new \GuzzleHttp\Client();
         $response = $client->request(
             'GET',
-            sprintf('https://adventofcode.com/2020/leaderboard/private/view/%s.json', $_ENV['LEADERBOARD']),
+            sprintf('https://adventofcode.com/%d/leaderboard/private/view/%s.json', $year, $_ENV['LEADERBOARD']),
             [ 'cookies' => $jar ]
         );
 
