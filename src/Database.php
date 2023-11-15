@@ -23,7 +23,8 @@ class Database
             year integer,
             name varchar,
             score integer,
-            last_star_ts integer
+            last_star_ts integer,
+            UNIQUE(id, year)
         );'
         );
 
@@ -53,6 +54,13 @@ class Database
         return $this->select('members', ['id', 'name', 'score', 'last_star_ts'], compact('year', 'id'))[0] ?? null;
     }
 
+    public function memberInSystem(int $id): bool
+    {
+        echo $id."\n";
+        echo count($this->select('members', ['id'], compact('id')))."\n";
+        return count($this->select('members', ['id'], compact('id'))) > 0;
+    }
+
     public function storeMember(int $year, int $id, string $name, int $score)
     {
         $this->insert('members', compact('year', 'id', 'name', 'score'));
@@ -60,7 +68,7 @@ class Database
 
     public function updateMember(int $year, int $id, string $name, int $score, int $last_star_ts)
     {
-        $this->update('members', compact('year', 'id', 'name', 'score', 'last_star_ts'), compact('id'));
+        $this->update('members', compact('year', 'id', 'name', 'score', 'last_star_ts'), compact('id', 'year'));
     }
 
     public function hasStar(int $year, int $member_id, int $day, int $part)

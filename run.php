@@ -14,68 +14,70 @@ $dotenv->load();
 
 $db = new Database();
 
-function processYear(int $year): array
+function processYears(int $startYear, int $endYear): array
 {
     global $db;
 
-    $leaderboard = AocLeaderboard::query($year);
-
     $newMembers = [];
-    $newStars = [];
 
-    /** @var AocMember $member */
-    foreach ($leaderboard->getMembers() as $member) {
-        $dbMember = $db->getMember($year, $member->getId());
+    for ($year = $startYear; $year <= $endYear; $year++) {
+        $newStars = [];
 
-        if ($dbMember === null) {
-            $newMembers[] = $member;
-            $db->storeMember($year, $member->getId(), $member->getName(), $member->getScore());
+        $leaderboard = AocLeaderboard::query($year);
+
+        /** @var AocMember $member */
+        foreach ($leaderboard->getMembers() as $member) {
             $dbMember = $db->getMember($year, $member->getId());
-        }
 
-        if ($dbMember['last_star_ts'] === $member->getLastStarTs()) {
-            continue;
-        }
-
-        /** @var AocDay $day */
-        foreach ($member->getDays() as $day) {
-            if ($day->hasPart1() && !$db->hasStar($year, $member->getId(), $day->getDay(), 1)) {
-                $newStars[] = ['member' => $member, 'day' => $day->getDay(), 'part' => 1];
-                $db->storeStar($year, $member->getId(), $day->getDay(), 1, $day->getPart1());
+            if ($dbMember === null) {
+                if (!$db->memberInSystem($member->getId())) {
+                    $newMembers[] = $member;
+                }
+                $db->storeMember($year, $member->getId(), $member->getName(), $member->getScore());
+                $dbMember = $db->getMember($year, $member->getId());
             }
 
-            if ($day->hasPart2() && !$db->hasStar($year, $member->getId(), $day->getDay(), 2)) {
-                $newStars[] = ['member' => $member, 'day' => $day->getDay(), 'part' => 2];
-                $db->storeStar($year, $member->getId(), $day->getDay(), 2, $day->getPart2());
+            if ($dbMember['last_star_ts'] === $member->getLastStarTs()) {
+                continue;
             }
+
+            /** @var AocDay $day */
+            foreach ($member->getDays() as $day) {
+                if ($day->hasPart1() && !$db->hasStar($year, $member->getId(), $day->getDay(), 1)) {
+                    $newStars[] = ['member' => $member, 'day' => $day->getDay(), 'part' => 1];
+                    $db->storeStar($year, $member->getId(), $day->getDay(), 1, $day->getPart1());
+                }
+
+                if ($day->hasPart2() && !$db->hasStar($year, $member->getId(), $day->getDay(), 2)) {
+                    $newStars[] = ['member' => $member, 'day' => $day->getDay(), 'part' => 2];
+                    $db->storeStar($year, $member->getId(), $day->getDay(), 2, $day->getPart2());
+                }
+            }
+
+            $db->updateMember($year, $member->getId(), $member->getName(), $member->getScore(), $member->getLastStarTs());
         }
 
-        $db->updateMember($year, $member->getId(), $member->getName(), $member->getScore(), $member->getLastStarTs());
-    }
+        foreach ($newStars as $star) {
+            $member = $star['member'];
+            $newMemberIds = array_map(fn ($a) => $a->getId(), $newMembers);
+            if (!in_array($member->getId(), $newMemberIds)) {
+                $day = $star['day'];
+                $part = $star['part'];
 
-    foreach ($newStars as $star) {
-        $member = $star['member'];
-        if (!array_search($member, $newMembers)) {
-            $day = $star['day'];
-            $part = $star['part'];
-
-            Slack::post(sprintf('[%04d] %s has just completed day %d, part %d!', $year, $member->getName(), $day, $part));
-            sleep(1);
+                Slack::post(sprintf('[%04d] %s has just completed day %d, part %d!', $year, $member->getName(), $day, $part));
+                sleep(1);
+            }
         }
     }
 
     return array_map(fn (AocMember $member): string => $member->getName(), $newMembers);
 }
 
-$newMembers = [];
+$newMemberNames = processYears(2015, date('Y'));
 
-for ($year = 2015; $year <= date('Y'); $year++) {
-    $newMembers = [...$newMembers, ...processYear($year)];
-}
+sort($newMemberNames);
+$newMemberNames = array_unique($newMemberNames);
 
-sort($newMembers);
-$newMembers = array_unique($newMembers);
-
-foreach ($newMembers as $member) {
+foreach ($newMemberNames as $member) {
     Slack::post('Welcome, ' . $member. '!');
 }
