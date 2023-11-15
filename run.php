@@ -26,7 +26,6 @@ function processYear(int $year): array
     /** @var AocMember $member */
     foreach ($leaderboard->getMembers() as $member) {
         $dbMember = $db->getMember($year, $member->getId());
-        $newMembers = [];
 
         if ($dbMember === null) {
             $newMembers[] = $member;
