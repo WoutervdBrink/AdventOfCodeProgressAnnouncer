@@ -56,8 +56,6 @@ class Database
 
     public function memberInSystem(int $id): bool
     {
-        echo $id."\n";
-        echo count($this->select('members', ['id'], compact('id')))."\n";
         return count($this->select('members', ['id'], compact('id'))) > 0;
     }
 
