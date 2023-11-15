@@ -26,11 +26,13 @@ function processYear(int $year): array
     /** @var AocMember $member */
     foreach ($leaderboard->getMembers() as $member) {
         $dbMember = $db->getMember($year, $member->getId());
+        $newMembers = [];
 
         if ($dbMember === null) {
             $newMembers[] = $member;
             $db->storeMember($year, $member->getId(), $member->getName(), $member->getScore());
             $dbMember = $db->getMember($year, $member->getId());
+            $newMembers[] = $member;
         }
 
         if ($dbMember['last_star_ts'] === $member->getLastStarTs()) {
@@ -55,11 +57,13 @@ function processYear(int $year): array
 
     foreach ($newStars as $star) {
         $member = $star['member'];
-        $day = $star['day'];
-        $part = $star['part'];
+        if (!array_search($newMembers, $member)) {
+            $day = $star['day'];
+            $part = $star['part'];
 
-        Slack::post(sprintf('[%04d] %s has just completed day %d, part %d!', $year, $member->getName(), $day, $part));
-        sleep(1);
+            Slack::post(sprintf('[%04d] %s has just completed day %d, part %d!', $year, $member->getName(), $day, $part));
+            sleep(1);
+        }
     }
 
     return array_map(fn (AocMember $member): string => $member->getName(), $newMembers);
