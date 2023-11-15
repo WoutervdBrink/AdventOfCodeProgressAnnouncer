@@ -55,7 +55,7 @@ function processYear(int $year): array
 
     foreach ($newStars as $star) {
         $member = $star['member'];
-        if (!array_search($newMembers, $member)) {
+        if (!array_search($member, $newMembers)) {
             $day = $star['day'];
             $part = $star['part'];
 
