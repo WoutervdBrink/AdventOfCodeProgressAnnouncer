@@ -32,7 +32,6 @@ function processYear(int $year): array
             $newMembers[] = $member;
             $db->storeMember($year, $member->getId(), $member->getName(), $member->getScore());
             $dbMember = $db->getMember($year, $member->getId());
-            $newMembers[] = $member;
         }
 
         if ($dbMember['last_star_ts'] === $member->getLastStarTs()) {
