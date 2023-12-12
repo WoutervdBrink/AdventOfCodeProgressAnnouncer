@@ -46,6 +46,8 @@ class AocLeaderboard
             throw new \Exception("Request failed with ".$response->getStatusCode().": ".$response->getBody());
         }
 
+        echo $response->getBody();
+
         $data = @json_decode($response->getBody());
 
         $members = [];
