@@ -2,6 +2,8 @@
 
 namespace Knevelina\AocProgressAnnouncer;
 
+use GuzzleHttp\Exception\GuzzleException;
+
 class AocLeaderboard
 {
     private string $event;
@@ -24,6 +26,9 @@ class AocLeaderboard
     }
 
 
+    /**
+     * @throws GuzzleException
+     */
     public static function query(int $year): AocLeaderboard
     {
         $jar = \GuzzleHttp\Cookie\CookieJar::fromArray([
@@ -36,6 +41,10 @@ class AocLeaderboard
             sprintf('https://adventofcode.com/%d/leaderboard/private/view/%s.json', $year, $_ENV['LEADERBOARD']),
             [ 'cookies' => $jar ]
         );
+
+        if ($response->getStatusCode() != 200) {
+            throw new \Exception("Request failed with ".$response->getStatusCode().": ".$response->getBody());
+        }
 
         $data = @json_decode($response->getBody());
 
