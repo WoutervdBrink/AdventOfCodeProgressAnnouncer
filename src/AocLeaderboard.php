@@ -42,12 +42,6 @@ class AocLeaderboard
             [ 'cookies' => $jar ]
         );
 
-        if ($response->getStatusCode() != 200) {
-            throw new \Exception("Request failed with ".$response->getStatusCode().": ".$response->getBody());
-        }
-
-        echo $response->getBody();
-
         $data = @json_decode($response->getBody());
 
         $members = [];
