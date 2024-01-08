@@ -73,7 +73,7 @@ function processYears(int $startYear, int $endYear): array
     return array_map(fn (AocMember $member): string => $member->getName(), $newMembers);
 }
 
-$newMemberNames = processYears(2015, date('Y'));
+$newMemberNames = processYears(2015, date('m') > 11 ? date('Y') : date('Y') - 1);
 
 sort($newMemberNames);
 $newMemberNames = array_unique($newMemberNames);
