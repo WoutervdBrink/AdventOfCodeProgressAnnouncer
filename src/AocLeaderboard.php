@@ -2,6 +2,8 @@
 
 namespace Knevelina\AocProgressAnnouncer;
 
+use GuzzleHttp\Exception\GuzzleException;
+
 class AocLeaderboard
 {
     private string $event;
@@ -24,6 +26,9 @@ class AocLeaderboard
     }
 
 
+    /**
+     * @throws GuzzleException
+     */
     public static function query(int $year): AocLeaderboard
     {
         $jar = \GuzzleHttp\Cookie\CookieJar::fromArray([

@@ -11,8 +11,11 @@ class Slack
     public static function post(string $message)
     {
         $client = new Client();
-        $client->request('POST', $_ENV['SLACK_URL'], ['json' => [
-            'text' => $message
-        ]]);
+        $urls = explode(",", $_ENV['SLACK_URLS']);
+        foreach ($urls as $url) {
+            $client->request('POST', $url, ['json' => [
+                'text' => $message
+            ]]);
+        }
     }
 }
